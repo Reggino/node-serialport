@@ -15,8 +15,6 @@ switch (process.platform) {
     platform = 'unix';
 }
 
-console.log('Testing on ' + platform);
-
 var defaultPortOpenOptions = {
   baudRate: 9600,
   parity: 'none',
@@ -111,6 +109,52 @@ describe('SerialPortBinding', function () {
         });
         done();
       });
+    });
+  });
+
+  describe('#update', function() {
+    if (platform === 'win32') {
+      it('on windows it returns an error', function(done) {
+        SerialPortBinding.update(99, defaultPortOpenOptions, function(err, data) {
+          assert.instanceOf(err, Error);
+          assert.isUndefined(data);
+          done();
+        });
+      });
+      return;
+    }
+
+    it('errors when updating nothing', function(done) {
+      try {
+        SerialPortBinding.update(99, {}, function() {});
+      } catch (err) {
+        assert.instanceOf(err, Error);
+        done();
+      }
+    });
+
+    if (!testPort) {
+      it('Cannot be tested further. Set the TEST_PORT env var with an available serialport for more testing.');
+      return;
+    }
+
+    beforeEach(function(done) {
+      SerialPortBinding.open(testPort, defaultPortOpenOptions, function(err, fd) {
+        assert.isNull(err);
+        assert.isNumber(fd);
+        this.fd = fd;
+        done();
+      }.bind(this));
+    });
+
+    afterEach(function(done) {
+      var fd = this.fd;
+      this.fd = null;
+      SerialPortBinding.close(fd, done);
+    });
+
+    it('updates baudRate', function(done) {
+      SerialPortBinding.update(this.fd, {baudRate: 57600}, done);
     });
   });
 });
