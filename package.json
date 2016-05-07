@@ -87,12 +87,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "install": "node-pre-gyp install --fallback-to-build",
-    "rebuild-all": "npm rebuild && node-pre-gyp rebuild",
-    "stress": "mocha --no-timeouts test/arduinoTest/stress.js",
-    "grunt": "grunt",
-    "test": "grunt --verbose",
-    "prepublish": "npm ls"
+    "install": "node-gyp rebuild --target=0.36.12 --dist-url=https://atom.io/download/atom-shell",
+    "test": "grunt --verbose"
   },
   "gypfile": true
 }
